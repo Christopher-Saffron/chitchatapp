@@ -18,12 +18,12 @@ export const authOptions: AuthOptions = {
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID as string,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET as string
-        })
+        }),
         CredentialsProvider({
             name: 'credentials',
             credentials: {
                 email: {label: 'email', type: 'text'},
-                email: {label: 'password', type: 'password'},
+                password: {label: 'password', type: 'password'},
 
             },
             async authorize(credentials) {
@@ -33,12 +33,30 @@ export const authOptions: AuthOptions = {
                 const user = await prisma.user.findUnique({
                     where: {
                         email: credentials.email
+                    }
                 })
 
-                if (!user || !user?.hashedPassword) {g
+                if (!user || !user?.hashedPssword) {
                     throw new Error('Invalid credentials')
                 }
+
+                const isCorrectPassword = await bcrypt.compare(credentials.password, user.hashedPssword)
+
+                if (!isCorrectPassword) {
+                    throw new Error('Invalid Credentials')
+                }
+
+                return user
             }
         })
-    ]
+    ],
+    debug: process.env.NODE_ENV === 'development',
+    session: {
+        strategy: 'jwt',
+    },
+    secret: process.env.NEXTAUTH_SECRET,
 }
+
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST}

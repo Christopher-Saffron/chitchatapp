@@ -5,8 +5,8 @@ import getCurrentUser from "@/actions/getCurrentUser";
 async function Sidebar({ children }: { children: React.ReactNode }) {
   const currentUser = await getCurrentUser();
   return (
-    <div className="border w-2/3 h-screen flex">
-      <DesktopSidebar />
+    <div className="border border-pink-500 w-2/3 h-screen flex">
+      <DesktopSidebar currentUser={currentUser!} />
       <main>{children}</main>
     </div>
   );

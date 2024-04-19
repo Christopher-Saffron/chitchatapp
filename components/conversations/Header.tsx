@@ -2,8 +2,9 @@
 
 import useOtherUser from "@/hooks/useOtherUser";
 import { Conversation, User } from "@prisma/client";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import Avatar from "../Avatar";
+import ProfileDrawer from "./ProfileDrawer";
 
 interface HeaderProps {
   conversation: Conversation & {
@@ -13,6 +14,7 @@ interface HeaderProps {
 
 function Header({ conversation }: HeaderProps) {
   const otherUser = useOtherUser(conversation);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const statusText = useMemo(() => {
     if (conversation.isGroup) {
@@ -23,13 +25,21 @@ function Header({ conversation }: HeaderProps) {
   }, [conversation]);
 
   return (
-    <div className="p-3 border-b flex gap-4 items-center">
-      <Avatar user={otherUser} />
-      <div className="flex flex-col">
-        <div>{conversation.name || otherUser.name}</div>
-        <div>{statusText}</div>
+    <>
+      <ProfileDrawer
+        data={conversation}
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+      />
+      <div className="p-3 border-b flex gap-4 items-center">
+        <Avatar user={otherUser} />
+        <div className="flex flex-col">
+          <div>{conversation.name || otherUser.name}</div>
+          <div>{statusText}</div>
+        </div>
       </div>
-    </div>
+      <div onClick={() => setDrawerOpen(true)}>SETTINGS</div>
+    </>
   );
 }
 
